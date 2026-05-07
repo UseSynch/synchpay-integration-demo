@@ -1,0 +1,106 @@
+@page "/"
+@rendermode InteractiveServer
+@using SynchPayIntegrationDemo.Services
+@inject SynchPayApiClient SynchPay
+
+<PageTitle>SynchPay integration demo</PageTitle>
+
+<div class="payment-page">
+    <section class="payment-header">
+        <p class="eyebrow">SynchPay integration demo</p>
+        <h1>Create payment</h1>
+    </section>
+
+    <EditForm Model="form" OnValidSubmit="CreatePaymentAsync" class="payment-form">
+        <DataAnnotationsValidator />
+
+        <div class="form-grid">
+            <label>
+                <span>Client ID</span>
+                <InputText class="form-control" @bind-Value="form.ClientId" autocomplete="off" />
+            </label>
+
+            <label>
+                <span>Client secret</span>
+                <InputText class="form-control" @bind-Value="form.ClientSecret" type="password" autocomplete="off" />
+            </label>
+
+            <label>
+                <span>Company ID</span>
+                <InputText class="form-control" @bind-Value="form.CompanyId" autocomplete="off" />
+            </label>
+
+            <label>
+                <span>Customer phone number</span>
+                <InputText class="form-control" @bind-Value="form.ContactNumber" autocomplete="tel" />
+            </label>
+
+            <label>
+                <span>Payment amount</span>
+                <InputNumber class="form-control" @bind-Value="form.Amount" min="0.01" step="0.01" />
+            </label>
+        </div>
+
+        <button class="btn btn-primary create-button" type="submit" disabled="@isSubmitting">
+            @(isSubmitting ? "Creating payment..." : "Create payment")
+        </button>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-danger" role="alert">@errorMessage</div>
+        }
+    </EditForm>
+
+    <section class="payment-preview" aria-label="Payment page preview">
+        <label class="url-bar">
+            <span>Payment URL</span>
+            <input class="form-control" value="@(paymentUrl ?? "Payment URL will appear here.")" readonly />
+        </label>
+
+        <div class="iframe-shell">
+            @if (string.IsNullOrWhiteSpace(paymentUrl))
+            {
+                <div class="iframe-placeholder">Payment page will appear here.</div>
+            }
+            else
+            {
+                <iframe title="SynchPay payment" src="@paymentUrl"></iframe>
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private readonly PaymentFormModel form = new()
+    {
+        ClientId = "",
+        ClientSecret = "",
+        CompanyId = "",
+        ContactNumber = "",
+        Amount = 1
+    };
+
+    private bool isSubmitting;
+    private string? paymentUrl;
+    private string? errorMessage;
+
+    private async Task CreatePaymentAsync()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+
+        try
+        {
+            paymentUrl = await SynchPay.CreatePaymentAsync(form);
+        }
+        catch (Exception ex)
+        {
+            paymentUrl = null;
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}

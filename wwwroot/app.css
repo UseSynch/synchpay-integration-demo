@@ -1,0 +1,180 @@
+html,
+body {
+    min-height: 100%;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    color: #18202f;
+    background: #f6f7f9;
+}
+
+.app-shell {
+    min-height: 100vh;
+}
+
+.payment-page {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 40px 0;
+}
+
+.payment-header {
+    margin-bottom: 24px;
+}
+
+.eyebrow {
+    margin: 0 0 6px;
+    color: #667085;
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+h1 {
+    margin: 0;
+    font-size: 2.1rem;
+    font-weight: 700;
+}
+
+.payment-form {
+    margin-bottom: 24px;
+    padding: 24px;
+    border: 1px solid #d7dce3;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.form-grid label {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+    color: #344054;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.form-control {
+    min-height: 44px;
+    border-color: #cfd6df;
+    border-radius: 6px;
+}
+
+.form-control:focus {
+    border-color: #1769aa;
+    box-shadow: 0 0 0 0.2rem rgba(23, 105, 170, 0.14);
+}
+
+.btn-primary {
+    min-height: 44px;
+    padding: 0 18px;
+    border-color: #1769aa;
+    border-radius: 6px;
+    background: #1769aa;
+    font-weight: 700;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    border-color: #10598f;
+    background: #10598f;
+}
+
+.create-button {
+    min-width: 150px;
+}
+
+.alert {
+    margin: 18px 0 0;
+}
+
+.payment-preview {
+    display: grid;
+    gap: 10px;
+}
+
+.url-bar {
+    display: grid;
+    gap: 8px;
+    color: #344054;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.url-bar input[readonly] {
+    color: #475467;
+    background: #ffffff;
+}
+
+.iframe-shell {
+    min-height: 560px;
+    overflow: hidden;
+    border: 1px solid #d7dce3;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.iframe-shell iframe {
+    display: block;
+    width: 100%;
+    height: 680px;
+    border: 0;
+}
+
+.iframe-placeholder {
+    display: grid;
+    min-height: 560px;
+    place-items: center;
+    color: #667085;
+    font-weight: 600;
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid #e50000;
+}
+
+.validation-message {
+    color: #e50000;
+}
+
+.blazor-error-boundary {
+    padding: 1rem;
+    color: white;
+    background: #b32121;
+}
+
+.blazor-error-boundary::after {
+    content: "An error has occurred.";
+}
+
+.darker-border-checkbox.form-check-input {
+    border-color: #929292;
+}
+
+@media (max-width: 720px) {
+    .payment-page {
+        width: min(100% - 24px, 1120px);
+        padding: 24px 0;
+    }
+
+    .payment-form {
+        padding: 18px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .create-button {
+        width: 100%;
+    }
+}
