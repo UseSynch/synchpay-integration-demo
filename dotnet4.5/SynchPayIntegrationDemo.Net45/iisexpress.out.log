@@ -1,0 +1,27 @@
+Starting IIS Express ...
+Successfully registered URL "http://localhost:5112/" for site "Development Web Site" application "/"
+Registration completed
+IIS Express is running.
+Enter 'Q' to stop IIS Express
+Rozpoczêcie ¿¹dania: „GET” http://localhost:5112/
+Response sent: http://localhost:5112/default.aspx with HTTP status 200.0
+Rozpoczêcie ¿¹dania: „GET” http://localhost:5112/
+Response sent: http://localhost:5112/default.aspx with HTTP status 200.0
+Rozpoczêcie ¿¹dania: „GET” http://localhost:5112/Styles/site.css
+Rozpoczêcie ¿¹dania: „GET” http://localhost:5112/WebResource.axd?d=pynGkmcFUV13He1Qd6_TZKh3x7CHv-NfYgRENM9d2OLFauFTWnntXP-jFHsfA5zEAu99Mfu7UdI4KZxEe0s5Ig2&t=638914436334897068
+Rozpoczêcie ¿¹dania: „GET” http://localhost:5112/WebResource.axd?d=x2nkrMJGXkMELz33nwnakPQAc7r5sHkorTkOvKT9cG12U9e6-aSEnk3OBeAwc1HgfjHkzDO1bzCnAl_Pm3MVibCo2x8phG1zvDABuwjux641&t=638914436334897068
+Response sent: http://localhost:5112/Styles/site.css with HTTP status 200.0
+Response sent: http://localhost:5112/WebResource.axd?d=x2nkrMJGXkMELz33nwnakPQAc7r5sHkorTkOvKT9cG12U9e6-aSEnk3OBeAwc1HgfjHkzDO1bzCnAl_Pm3MVibCo2x8phG1zvDABuwjux641&t=638914436334897068 with HTTP status 200.0
+Response sent: http://localhost:5112/WebResource.axd?d=pynGkmcFUV13He1Qd6_TZKh3x7CHv-NfYgRENM9d2OLFauFTWnntXP-jFHsfA5zEAu99Mfu7UdI4KZxEe0s5Ig2&t=638914436334897068 with HTTP status 200.0
+Rozpoczêcie ¿¹dania: „GET” http://localhost:5112/favicon.ico
+Response sent: http://localhost:5112/favicon.ico with HTTP status 404.0
+Rozpoczêcie ¿¹dania: „GET” http://localhost:5112/
+Response sent: http://localhost:5112/default.aspx with HTTP status 200.0
+Rozpoczêcie ¿¹dania: „GET” http://localhost:5112/Styles/site.css
+Response sent: http://localhost:5112/Styles/site.css with HTTP status 200.0
+Rozpoczêcie ¿¹dania: „GET” http://localhost:5112/WebResource.axd?d=pynGkmcFUV13He1Qd6_TZKh3x7CHv-NfYgRENM9d2OLFauFTWnntXP-jFHsfA5zEAu99Mfu7UdI4KZxEe0s5Ig2&t=638914436334897068
+Rozpoczêcie ¿¹dania: „GET” http://localhost:5112/WebResource.axd?d=x2nkrMJGXkMELz33nwnakPQAc7r5sHkorTkOvKT9cG12U9e6-aSEnk3OBeAwc1HgfjHkzDO1bzCnAl_Pm3MVibCo2x8phG1zvDABuwjux641&t=638914436334897068
+Response sent: http://localhost:5112/WebResource.axd?d=x2nkrMJGXkMELz33nwnakPQAc7r5sHkorTkOvKT9cG12U9e6-aSEnk3OBeAwc1HgfjHkzDO1bzCnAl_Pm3MVibCo2x8phG1zvDABuwjux641&t=638914436334897068 with HTTP status 200.0
+Response sent: http://localhost:5112/WebResource.axd?d=pynGkmcFUV13He1Qd6_TZKh3x7CHv-NfYgRENM9d2OLFauFTWnntXP-jFHsfA5zEAu99Mfu7UdI4KZxEe0s5Ig2&t=638914436334897068 with HTTP status 200.0
+Rozpoczêcie ¿¹dania: „POST” http://localhost:5112/
+Response sent: http://localhost:5112/default.aspx with HTTP status 200.0
