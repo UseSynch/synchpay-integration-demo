@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddHttpClient<SynchPayApiClient>();
+builder.Services.AddSingleton<PaymentStatusDecryptionService>();
 
 var app = builder.Build();
 

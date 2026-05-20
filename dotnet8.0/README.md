@@ -32,8 +32,12 @@ Open that URL in a browser.
    - `Company ID`
    - `Customer phone number`
    - `Payment amount`
+   - `Return URL`
+   - `Registration ID`
+   - `Status encryption key`
 3. Click `Create payment`.
 4. The app authenticates with SynchPay, creates a payment request, displays the returned payment URL, and loads it in the iframe below the form.
+5. If the payment completion redirect points back to this app at `/payment-status?data=<encrypted-payload>`, the status page decrypts and displays the returned JSON.
 
 ## Amount Format
 
@@ -86,16 +90,37 @@ Request body:
   "ContactNumber": "<customer-phone-number>",
   "CompanyId": "<company-id>",
   "Amount": 400,
-  "FeePayer": "partner"
+  "FeePayer": "partner",
+  "ReturnUrl": "<return-url>",
+  "RegistrationId": "<registration-id>"
 }
 ```
 
 The `url` returned by the payment creation endpoint is displayed above the iframe and loaded into the iframe.
+If `registrationPersonId` is returned, it is copied into the `Registration ID` input for the next payment request.
+
+## Payment Status Redirect
+
+The status decrypt page is available at:
+
+```text
+http://localhost:5111/payment-status?data=<encrypted-payload>
+```
+
+The page expects the `data` query parameter to contain the payload produced by SynchPay's AES-GCM status encryption:
+
+```text
+base64(nonce[12] + tag[16] + ciphertext)
+```
+
+The key entered in `Status encryption key` on the payment form is stored in browser session storage and reused by the payment status page. The status page also lets you enter or replace the key manually.
 
 ## Project Structure
 
 - `Components/Pages/Home.razor` - main Blazor view with the form and iframe
+- `Components/Pages/PaymentStatus.razor` - decrypts and displays the encrypted payment status redirect data
 - `Services/SynchPayApiClient.cs` - SynchPay authentication and payment API calls
+- `Services/PaymentStatusDecryptionService.cs` - AES-GCM payment status decryptor
 - `wwwroot/app.css` - demo styling
 
 ## Notes

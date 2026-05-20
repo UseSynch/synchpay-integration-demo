@@ -2,6 +2,8 @@
 @rendermode InteractiveServer
 @using SynchPayIntegrationDemo.Services
 @inject SynchPayApiClient SynchPay
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
 
 <PageTitle>SynchPay integration demo</PageTitle>
 
@@ -38,6 +40,21 @@
             <label>
                 <span>Payment amount</span>
                 <InputNumber class="form-control" @bind-Value="form.Amount" min="0.01" step="0.01" />
+            </label>
+
+            <label>
+                <span>Return URL</span>
+                <InputText class="form-control" @bind-Value="form.ReturnUrl" autocomplete="url" />
+            </label>
+
+            <label>
+                <span>Registration ID</span>
+                <InputText class="form-control" @bind-Value="form.RegistrationId" autocomplete="off" />
+            </label>
+
+            <label>
+                <span>Status encryption key</span>
+                <InputText class="form-control" @bind-Value="form.StatusEncryptionKey" type="password" autocomplete="off" />
             </label>
         </div>
 
@@ -77,12 +94,23 @@
         ClientSecret = "",
         CompanyId = "",
         ContactNumber = "",
-        Amount = 1
+        Amount = 1,
+        ReturnUrl = "",
+        RegistrationId = "",
+        StatusEncryptionKey = ""
     };
 
     private bool isSubmitting;
     private string? paymentUrl;
     private string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(form.ReturnUrl))
+        {
+            form.ReturnUrl = Navigation.ToAbsoluteUri("payment-status").ToString();
+        }
+    }
 
     private async Task CreatePaymentAsync()
     {
@@ -91,7 +119,14 @@
 
         try
         {
-            paymentUrl = await SynchPay.CreatePaymentAsync(form);
+            await JS.InvokeVoidAsync("synchPayStatus.setEncryptionKey", form.StatusEncryptionKey);
+            var payment = await SynchPay.CreatePaymentAsync(form);
+            paymentUrl = payment.Url;
+
+            if (!string.IsNullOrWhiteSpace(payment.RegistrationPersonId))
+            {
+                form.RegistrationId = payment.RegistrationPersonId;
+            }
         }
         catch (Exception ex)
         {

@@ -55,6 +55,8 @@
   <ItemGroup>
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="PaymentStatus.aspx" />
+    <Content Include="Scripts\status-decryption.js" />
     <Content Include="Styles\site.css" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -70,6 +72,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\PaymentFormModel.cs" />
+    <Compile Include="PaymentStatus.aspx.cs">
+      <DependentUpon>PaymentStatus.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="PaymentStatus.aspx.designer.cs">
+      <DependentUpon>PaymentStatus.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\SynchPayApiClient.cs" />
   </ItemGroup>

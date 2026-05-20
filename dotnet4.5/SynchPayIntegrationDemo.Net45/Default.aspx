@@ -49,12 +49,32 @@
                             <asp:RequiredFieldValidator ID="AmountRequiredValidator" runat="server" ControlToValidate="AmountTextBox" Display="Dynamic" CssClass="validation-message" ErrorMessage="Payment amount is required." />
                             <asp:CustomValidator ID="AmountValidator" runat="server" ControlToValidate="AmountTextBox" Display="Dynamic" CssClass="validation-message" ErrorMessage="Payment amount must be at least 0.01." OnServerValidate="AmountValidator_ServerValidate" />
                         </label>
+
+                        <label>
+                            <span>Return URL</span>
+                            <asp:TextBox ID="ReturnUrlTextBox" runat="server" CssClass="form-control" autocomplete="url" />
+                        </label>
+
+                        <label>
+                            <span>Registration ID</span>
+                            <asp:TextBox ID="RegistrationIdTextBox" runat="server" CssClass="form-control" autocomplete="off" />
+                        </label>
+
+                        <label>
+                            <span>Status encryption key</span>
+                            <asp:TextBox ID="StatusEncryptionKeyTextBox" runat="server" CssClass="form-control" TextMode="Password" autocomplete="off" />
+                        </label>
                     </div>
 
                     <asp:Button ID="CreatePaymentButton" runat="server" CssClass="btn btn-primary create-button" Text="Create payment" OnClick="CreatePaymentButton_Click" OnClientClick="return markSubmitting(this);" />
 
                     <asp:Panel ID="ErrorPanel" runat="server" CssClass="alert alert-danger" role="alert" Visible="false">
                         <asp:Literal ID="ErrorMessageLiteral" runat="server" />
+                    </asp:Panel>
+
+                    <asp:Panel ID="ApiRequestPanel" runat="server" CssClass="api-request" Visible="false">
+                        <h2>Payment create request body</h2>
+                        <pre><asp:Literal ID="ApiRequestBodyLiteral" runat="server" /></pre>
                     </asp:Panel>
                 </section>
 
@@ -63,6 +83,8 @@
                         <span>Payment URL</span>
                         <asp:TextBox ID="PaymentUrlTextBox" runat="server" CssClass="form-control" ReadOnly="true" />
                     </label>
+
+                    <asp:HyperLink ID="OpenPaymentLink" runat="server" CssClass="payment-link" Target="_blank" Visible="false">Open payment in new tab</asp:HyperLink>
 
                     <div class="iframe-shell">
                         <asp:Panel ID="PaymentPlaceholderPanel" runat="server" CssClass="iframe-placeholder">
@@ -81,6 +103,10 @@
                 return false;
             }
 
+            if (window.synchPayStatus) {
+                window.synchPayStatus.setEncryptionKey(document.getElementById("<%= StatusEncryptionKeyTextBox.ClientID %>").value);
+            }
+
             window.setTimeout(function () {
                 button.disabled = true;
                 button.value = "Creating payment...";
@@ -89,5 +115,6 @@
             return true;
         }
     </script>
+    <script src="Scripts/status-decryption.js"></script>
 </body>
 </html>

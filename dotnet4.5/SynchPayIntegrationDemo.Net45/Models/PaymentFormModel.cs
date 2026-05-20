@@ -14,6 +14,12 @@ namespace SynchPayIntegrationDemo.Net45.Models
 
         public decimal Amount { get; set; }
 
+        public string ReturnUrl { get; set; }
+
+        public string RegistrationId { get; set; }
+
+        public string StatusEncryptionKey { get; set; }
+
         public int AmountInCents
         {
             get

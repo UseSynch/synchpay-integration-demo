@@ -14,6 +14,8 @@ namespace SynchPayIntegrationDemo.Net45
             if (!IsPostBack)
             {
                 AmountTextBox.Text = "1";
+                ReturnUrlTextBox.Text = ResolveUrl("~/PaymentStatus.aspx");
+                ReturnUrlTextBox.Text = new Uri(Request.Url, ReturnUrlTextBox.Text).ToString();
                 PaymentUrlTextBox.Text = "Payment URL will appear here.";
             }
         }
@@ -28,19 +30,37 @@ namespace SynchPayIntegrationDemo.Net45
             }
 
             ErrorPanel.Visible = false;
+            ApiRequestPanel.Visible = false;
             PaymentPlaceholderPanel.Visible = true;
             PaymentFrameLiteral.Text = string.Empty;
             PaymentUrlTextBox.Text = "Payment URL will appear here.";
+            OpenPaymentLink.Visible = false;
 
             try
             {
                 var form = CreatePaymentFormModel();
                 var synchPay = new SynchPayApiClient();
-                var paymentUrl = await synchPay.CreatePaymentAsync(form);
+                var payment = await synchPay.CreatePaymentAsync(form);
 
-                PaymentUrlTextBox.Text = paymentUrl;
+                ShowPaymentRequestBody(payment.PaymentRequestBody);
+
+                PaymentUrlTextBox.Text = payment.Url;
+                OpenPaymentLink.NavigateUrl = payment.Url;
+                OpenPaymentLink.Visible = true;
+
+                if (!string.IsNullOrWhiteSpace(payment.RegistrationPersonId))
+                {
+                    RegistrationIdTextBox.Text = payment.RegistrationPersonId;
+                }
+
                 PaymentPlaceholderPanel.Visible = false;
-                PaymentFrameLiteral.Text = "<iframe title=\"SynchPay payment\" src=\"" + HttpUtility.HtmlAttributeEncode(paymentUrl) + "\"></iframe>";
+                PaymentFrameLiteral.Text = "<iframe title=\"SynchPay payment\" sandbox=\"allow-scripts allow-forms allow-same-origin\" src=\"" + HttpUtility.HtmlAttributeEncode(payment.Url) + "\"></iframe>";
+            }
+            catch (SynchPayApiException ex)
+            {
+                ShowPaymentRequestBody(ex.PaymentRequestBody);
+                ErrorMessageLiteral.Text = HttpUtility.HtmlEncode(ex.Message);
+                ErrorPanel.Visible = true;
             }
             catch (Exception ex)
             {
@@ -69,7 +89,10 @@ namespace SynchPayIntegrationDemo.Net45
                 ClientSecret = ClientSecretTextBox.Text.Trim(),
                 CompanyId = CompanyIdTextBox.Text.Trim(),
                 ContactNumber = ContactNumberTextBox.Text.Trim(),
-                Amount = amount
+                Amount = amount,
+                ReturnUrl = ReturnUrlTextBox.Text.Trim(),
+                RegistrationId = RegistrationIdTextBox.Text.Trim(),
+                StatusEncryptionKey = StatusEncryptionKeyTextBox.Text
             };
         }
 
@@ -77,6 +100,19 @@ namespace SynchPayIntegrationDemo.Net45
         {
             return decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out amount)
                 || decimal.TryParse(value, NumberStyles.Number, CultureInfo.CurrentCulture, out amount);
+        }
+
+        private void ShowPaymentRequestBody(string requestBody)
+        {
+            if (string.IsNullOrWhiteSpace(requestBody))
+            {
+                ApiRequestPanel.Visible = false;
+                ApiRequestBodyLiteral.Text = string.Empty;
+                return;
+            }
+
+            ApiRequestBodyLiteral.Text = HttpUtility.HtmlEncode(requestBody);
+            ApiRequestPanel.Visible = true;
         }
     }
 }

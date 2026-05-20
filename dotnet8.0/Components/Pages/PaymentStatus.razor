@@ -1,0 +1,100 @@
+@page "/payment-status"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components
+@using SynchPayIntegrationDemo.Services
+@inject PaymentStatusDecryptionService DecryptionService
+@inject IJSRuntime JS
+
+<PageTitle>Payment status</PageTitle>
+
+<div class="payment-page payment-status-page">
+    <section class="payment-header">
+        <p class="eyebrow">SynchPay integration demo</p>
+        <h1>Payment status</h1>
+    </section>
+
+    <section class="payment-form">
+        <div class="form-grid">
+            <label>
+                <span>Status encryption key</span>
+                <input class="form-control" @bind="encryptionKey" @bind:event="oninput" type="password" autocomplete="off" />
+            </label>
+
+            <label>
+                <span>Encrypted data</span>
+                <textarea class="form-control encrypted-data-input" @bind="encryptedData" @bind:event="oninput"></textarea>
+            </label>
+        </div>
+
+        <button class="btn btn-primary create-button" type="button" @onclick="DecryptAsync">Decrypt status</button>
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-danger" role="alert">@errorMessage</div>
+        }
+    </section>
+
+    <section class="status-result" aria-label="Decrypted payment status">
+        @if (string.IsNullOrWhiteSpace(decryptedJson))
+        {
+            <div class="iframe-placeholder">Payment status will appear here.</div>
+        }
+        else
+        {
+            <pre>@decryptedJson</pre>
+        }
+    </section>
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "data")]
+    public string? Data { get; set; }
+
+    private string encryptedData = string.Empty;
+    private string encryptionKey = string.Empty;
+    private string? decryptedJson;
+    private string? errorMessage;
+
+    protected override void OnParametersSet()
+    {
+        encryptedData = Data ?? encryptedData;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        encryptionKey = await JS.InvokeAsync<string>("synchPayStatus.getEncryptionKey") ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(encryptedData) && !string.IsNullOrWhiteSpace(encryptionKey))
+        {
+            Decrypt();
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task DecryptAsync()
+    {
+        await JS.InvokeVoidAsync("synchPayStatus.setEncryptionKey", encryptionKey);
+        Decrypt();
+    }
+
+    private void Decrypt()
+    {
+        errorMessage = null;
+        decryptedJson = null;
+
+        try
+        {
+            decryptedJson = DecryptionService.DecryptToJson(encryptedData, encryptionKey);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+}

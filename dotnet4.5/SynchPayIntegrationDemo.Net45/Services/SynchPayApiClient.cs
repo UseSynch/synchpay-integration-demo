@@ -15,7 +15,7 @@ namespace SynchPayIntegrationDemo.Net45.Services
         private static readonly Uri AuthEndpoint = new Uri("https://api.trysynch.com/auth/token");
         private static readonly Uri PaymentEndpoint = new Uri("http://api.trysynch.com/payment/create");
 
-        public async Task<string> CreatePaymentAsync(PaymentFormModel form)
+        public async Task<CreatePaymentResult> CreatePaymentAsync(PaymentFormModel form)
         {
             ServicePointManager.SecurityProtocol = ServicePointManager.SecurityProtocol | (SecurityProtocolType)3072;
 
@@ -29,9 +29,9 @@ namespace SynchPayIntegrationDemo.Net45.Services
 
                 using (var authResponse = await PostJsonAsync(httpClient, AuthEndpoint, authRequest).ConfigureAwait(false))
                 {
-                    authResponse.EnsureSuccessStatusCode();
-
                     var authJson = await authResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    EnsureSuccessStatusCode(authResponse, authJson, "Authentication");
+
                     var auth = DeserializeJsonObject(authJson, "Authentication response was empty.");
                     var accessToken = GetRequiredString(auth, "AccessToken", "Authentication response did not include an access token.");
                     var tokenType = GetOptionalString(auth, "TokenType");
@@ -41,26 +41,26 @@ namespace SynchPayIntegrationDemo.Net45.Services
                         tokenType = "Bearer";
                     }
 
-                    var paymentRequest = new CreatePaymentRequest
-                    {
-                        ContactNumber = form.ContactNumber,
-                        CompanyId = form.CompanyId,
-                        Amount = form.AmountInCents,
-                        FeePayer = "partner"
-                    };
+                    var paymentRequest = CreatePaymentRequest(form);
+                    var paymentRequestJson = SerializeJson(paymentRequest);
 
                     using (var paymentMessage = new HttpRequestMessage(HttpMethod.Post, PaymentEndpoint))
                     {
-                        paymentMessage.Content = CreateJsonContent(paymentRequest);
+                        paymentMessage.Content = CreateJsonContent(paymentRequestJson);
                         paymentMessage.Headers.Authorization = new AuthenticationHeaderValue(tokenType, accessToken);
 
                         using (var paymentResponse = await httpClient.SendAsync(paymentMessage).ConfigureAwait(false))
                         {
-                            paymentResponse.EnsureSuccessStatusCode();
-
                             var paymentJson = await paymentResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            EnsureSuccessStatusCode(paymentResponse, paymentJson, "Payment creation", paymentRequestJson);
+
                             var payment = DeserializeJsonObject(paymentJson, "Payment response was empty.");
-                            return GetRequiredString(payment, "Url", "Payment response did not include a URL.");
+                            return new CreatePaymentResult
+                            {
+                                Url = GetRequiredString(payment, "Url", "Payment response did not include a URL."),
+                                RegistrationPersonId = GetOptionalString(payment, "RegistrationPersonId"),
+                                PaymentRequestBody = paymentRequestJson
+                            };
                         }
                     }
                 }
@@ -74,9 +74,76 @@ namespace SynchPayIntegrationDemo.Net45.Services
 
         private static HttpContent CreateJsonContent(object value)
         {
-            var serializer = new JavaScriptSerializer();
-            var json = serializer.Serialize(value);
+            return CreateJsonContent(SerializeJson(value));
+        }
+
+        private static HttpContent CreateJsonContent(string json)
+        {
             return new StringContent(json, Encoding.UTF8, "application/json");
+        }
+
+        private static string SerializeJson(object value)
+        {
+            var serializer = new JavaScriptSerializer();
+            return serializer.Serialize(value);
+        }
+
+        private static IDictionary<string, object> CreatePaymentRequest(PaymentFormModel form)
+        {
+            var request = new Dictionary<string, object>
+            {
+                { "ContactNumber", form.ContactNumber },
+                { "CompanyId", form.CompanyId },
+                { "Amount", form.AmountInCents },
+                { "FeePayer", "partner" }
+            };
+
+            AddOptionalValue(request, "ReturnUrl", form.ReturnUrl);
+            AddOptionalValue(request, "RegistrationId", form.RegistrationId);
+
+            return request;
+        }
+
+        private static void AddOptionalValue(IDictionary<string, object> request, string key, string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                request.Add(key, value.Trim());
+            }
+        }
+
+        private static void EnsureSuccessStatusCode(HttpResponseMessage response, string responseBody, string operationName, string paymentRequestBody = null)
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            var message = new StringBuilder();
+            message.Append(operationName);
+            message.Append(" request failed with HTTP ");
+            message.Append((int)response.StatusCode);
+            message.Append(" ");
+            message.Append(response.ReasonPhrase);
+            message.Append(".");
+
+            if (!string.IsNullOrWhiteSpace(paymentRequestBody))
+            {
+                message.AppendLine();
+                message.AppendLine();
+                message.AppendLine("Payment create request body:");
+                message.Append(paymentRequestBody);
+            }
+
+            if (!string.IsNullOrWhiteSpace(responseBody))
+            {
+                message.AppendLine();
+                message.AppendLine();
+                message.AppendLine("Response body:");
+                message.Append(responseBody);
+            }
+
+            throw new SynchPayApiException(message.ToString(), paymentRequestBody);
         }
 
         private static IDictionary<string, object> DeserializeJsonObject(string json, string emptyMessage)
@@ -129,15 +196,25 @@ namespace SynchPayIntegrationDemo.Net45.Services
             public string ClientSecret { get; set; }
         }
 
-        private sealed class CreatePaymentRequest
+    }
+
+    public sealed class CreatePaymentResult
+    {
+        public string Url { get; set; }
+
+        public string RegistrationPersonId { get; set; }
+
+        public string PaymentRequestBody { get; set; }
+    }
+
+    public sealed class SynchPayApiException : InvalidOperationException
+    {
+        public SynchPayApiException(string message, string paymentRequestBody)
+            : base(message)
         {
-            public string ContactNumber { get; set; }
-
-            public string CompanyId { get; set; }
-
-            public int Amount { get; set; }
-
-            public string FeePayer { get; set; }
+            PaymentRequestBody = paymentRequestBody;
         }
+
+        public string PaymentRequestBody { get; private set; }
     }
 }

@@ -26,13 +26,25 @@ namespace SynchPayIntegrationDemo.Net45
 
         protected global::System.Web.UI.WebControls.CustomValidator AmountValidator;
 
+        protected global::System.Web.UI.WebControls.TextBox ReturnUrlTextBox;
+
+        protected global::System.Web.UI.WebControls.TextBox RegistrationIdTextBox;
+
+        protected global::System.Web.UI.WebControls.TextBox StatusEncryptionKeyTextBox;
+
         protected global::System.Web.UI.WebControls.Button CreatePaymentButton;
 
         protected global::System.Web.UI.WebControls.Panel ErrorPanel;
 
         protected global::System.Web.UI.WebControls.Literal ErrorMessageLiteral;
 
+        protected global::System.Web.UI.WebControls.Panel ApiRequestPanel;
+
+        protected global::System.Web.UI.WebControls.Literal ApiRequestBodyLiteral;
+
         protected global::System.Web.UI.WebControls.TextBox PaymentUrlTextBox;
+
+        protected global::System.Web.UI.WebControls.HyperLink OpenPaymentLink;
 
         protected global::System.Web.UI.WebControls.Panel PaymentPlaceholderPanel;
 
